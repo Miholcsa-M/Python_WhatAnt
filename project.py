@@ -1,5 +1,4 @@
 import csv
-import webbrowser
 
 CSV_FILE = "romanian_ants_iteration2_habitat_10classes_corrected.csv"
 
@@ -16,10 +15,7 @@ class Species:
         return self.name
 
     def antwiki_url(self):
-        """
-        AntWiki link generálása a faj nevéből.
-        Pl. "Formica rufa" -> "https://www.antwiki.org/wiki/Formica_rufa"
-        """
+        # Formica rufa -> https://www.antwiki.org/wiki/Formica_rufa
         return "https://www.antwiki.org/wiki/" + self.name.replace(" ", "_")
 
     def full_info(self):
@@ -38,28 +34,22 @@ def load_species(filename):
     with open(filename, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            name = (row.get("Species") or "").strip()
-            author = (row.get("Author") or "").strip()
-            year = (row.get("Year") or "").strip()
-            habitat = (row.get("Habitat") or "").strip()
-            # Strategy oszlop lehet "CompetitionStrategy" vagy "Competition strategy"
-            strategy = (
-                row.get("CompetitionStrategy")
-                or row.get("Competition strategy")
-                or ""
-            ).strip()
-
-            if name:  # csak akkor vesszük fel, ha van fajnév
-                species_list.append(
-                    Species(name, author, year, habitat, strategy)
+            species_list.append(
+                Species(
+                    row["Species"].strip(),
+                    (row["Author"] or "").strip(),
+                    row["Year"],
+                    (row["Habitat"] or "").strip(),
+                    (row["Competition_Strategy"] or "").strip()
                 )
+            )
     return species_list
 
 
 def display_main_menu():
     print("\n=== Romanian Ant Species Project ===")
     print("1. Iteration 1 – Basic operations (name-based)")
-    print("2. Iteration 2 – Detailed species information + AntWiki")
+    print("2. Iteration 2 – Detailed species information")
     print("3. Exit")
 
 
@@ -116,7 +106,7 @@ def iteration1(species_list):
 
 def iteration2_menu():
     print("\n--- Iteration 2: Detailed species information ---")
-    print("1. Search species by name or pattern (with AntWiki link)")
+    print("1. Search species by name or pattern")
     print("2. List species by habitat")
     print("3. Back to main menu")
 
@@ -134,14 +124,11 @@ def iteration2(species_list):
                 for sp in matches:
                     print("-" * 40)
                     print(sp.full_info())
-                    open_link = input("Open AntWiki page for this species? (y/n): ").lower()
-                    if open_link == "y":
-                        webbrowser.open(sp.antwiki_url())
             else:
                 print("No species found.")
 
         elif choice == "2":
-            print("\nExample habitats (exact names in CSV):")
+            print("\nExample habitats (case sensitive in CSV, but we compare lowercase):")
             print("  Coniferous Forest")
             print("  Mixed / Edge Forest")
             print("  Deciduous Forest")
