@@ -1,1 +1,1 @@
-print("asdf")
+print("latod-e te paraszt?")
